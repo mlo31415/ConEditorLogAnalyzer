@@ -1,6 +1,6 @@
 from __future__ import annotations
 import datetime
-from typing import List
+from typing import List, Dict
 import re
 from datetime import datetime
 
@@ -15,7 +15,7 @@ class Action():
         self.Convention: str=""
         self.Name: str=""
         self.Pages: int=0
-        self.Size: int=0
+        self.Bytes: int=0
 
     def IsEmpty(self) -> bool:
         if len(self.Editor) > 0:
@@ -29,6 +29,30 @@ class Action():
         if self.Date is not None:
             return False
         return True
+
+
+# Key is con series name; Value is Dict of con instance names.
+#       For this Dict, its key is the ConInstance name, its value is a list of files
+class Conlist():
+    def __init__(self):
+        self.List: Dict={}
+        self.Itemcount: int=0
+
+    def Append(self, Series: str="", Instance: str="", File: str=""):
+        if len(Series) > 0 and len(Instance) > 0 and len(File) > 0:
+            if Series not in self.List.keys():
+                self.List[Series]={}
+            if Instance not in self.List[Series].keys():
+                self.List[Series][Instance]=[]
+            self.List[Series][Instance].append(File)
+            self.Itemcount+=1
+
+
+class Accumulator():
+    def __init__(self):
+        self.ConList: Conlist=Conlist()
+        self.Pagecount: int=0
+        self.Bytecount: int=0
 
 
 #####################################################################
@@ -79,11 +103,22 @@ for line in lines:
         m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=(\d*); Pages=(\d*);", line)
         if m is not None:
             action.Name=m.groups()[0]
-            action.Size=m.groups()[1]
-            action.Pages=m.groups()[2]
+            action.Bytes=int(m.groups()[1])
+            action.Pages=int(m.groups()[2])
         actions.append(action)
 
 
 # OK, we have turned the log file into the actions list
 # Now analyze the actions list
+# We'll create a dictionary of editors with the value bring the accumulators
+results={}  # Key is editor, value is an accumulator
+
+for action in actions:
+    if action.Editor not in results.keys():
+        results[action.Editor]=Accumulator()
+    acc=results[action.Editor]
+    acc.Pagecount+=action.Pages
+    acc.Bytecount+=action.Bytes
+    acc.ConList.Append(action.ConSeries, action.Convention, action.Name)
+
 i=0
