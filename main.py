@@ -146,7 +146,7 @@ with open("Full report.txt", "w+") as f:
         f.writelines("Editor: "+IDToName(editor)\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+str(acc.Bytecount)+" bytes\n")
         for conseries in acc.ConList.List:
-            f.writelines("   "+conseries)
+            f.writelines("Conventions updated: "+conseries)
         f.writelines("\n\n")
 
 i=0
