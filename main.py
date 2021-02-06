@@ -107,6 +107,17 @@ for line in lines:
             action.Pages=int(m.groups()[2])
         actions.append(action)
 
+lines=[]
+try:
+    with open("Last time.txt", "r") as f:
+        lines=f.readlines()
+        lines=[f for l in lines if len(l.trim()) > 0 and l.trim()[0] != "#"]    # Remove empty lines and lines starting with "#"
+    if len(lines) > 0:
+        startdatetime=datetime.strptime(lines[0], "%A %B %d, %Y  %I:%M:%S %p")
+        # Remove all actions occuring before startdatetime
+        actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
+except FileNotFoundError:
+    pass
 
 # OK, we have turned the log file into the actions list
 # Now analyze the actions list
