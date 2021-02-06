@@ -108,13 +108,15 @@ for line in lines:
             action.Pages=int(m.groups()[2])
         actions.append(action)
 
+# If we have a "Last time.txt" file, strip out all activity before that time.
+# This file is created at the end of processing, so that the next time ConEditorLogAnalyzer runs, it only lists new stuff.
 lines=[]
 try:
     with open("Last time.txt", "r") as f:
         lines=f.readlines()
-        lines=[f for l in lines if len(l.trim()) > 0 and l.trim()[0] != "#"]    # Remove empty lines and lines starting with "#"
+        lines=[l.strip() for l in lines if len(l.strip()) > 0 and l.strip()[0] != "#"]    # Remove empty lines and lines starting with "#"
     if len(lines) > 0:
-        startdatetime=datetime.strptime(lines[0], "%A %B %d, %Y  %I:%M:%S %p")
+        startdatetime=datetime.strptime(lines[0], "%B %d, %Y  %I:%M:%S %p")
         # Remove all actions occuring before startdatetime
         actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
 except FileNotFoundError:
@@ -195,5 +197,19 @@ with open("Con detail report.txt", "w+") as f:
             f.writelines("\n")
         f.writelines("\n\n")
 
+# Write the timestamp
+lines=[]
+if os.path.exists("Last time.txt"):
+    with open("Last time.txt", "r") as f:
+        lines=f.readlines()
+with open("Last time.txt", "w") as f:
+    # Rewrite the file, replacing the date line (if one is present)
+    # Basically, we preserve empty lines and lines with '#" is the first non-blank character and replace the first line of any other type with the datetime
+    for line in lines:
+        line=line.strip()
+        if len(line) == 0 or line[0] == "#":
+            f.writelines(line+"\n")
+            continue
+    f.writelines(datetime.now().strftime("%B %d, %Y  %I:%M:%S %p")+"\n")
 
 i=0
