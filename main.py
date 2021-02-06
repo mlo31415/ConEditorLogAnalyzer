@@ -131,4 +131,12 @@ for action in actions:
     acc.Bytecount+=action.Bytes
     acc.ConList.Append(action.ConSeries, action.Convention, action.Name)
 
+# Write reports
+with open("Full report.txt", "w+") as f:
+    for editor, acc in results.items():
+        f.writelines("Editor: "+editor+"   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+str(acc.Bytecount)+" bytes\n")
+        for conseries in acc.ConList.List:
+            f.writelines("   "+conseries)
+        f.writelines("\n\n")
+
 i=0
