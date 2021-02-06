@@ -131,10 +131,20 @@ for action in actions:
     acc.Bytecount+=action.Bytes
     acc.ConList.Append(action.ConSeries, action.Convention, action.Name)
 
+def IDToName(id: str) -> str:
+    convert={
+        "conpubs": "Mark Olson",
+        "cp-edie": "Edie Stern"
+    }
+    if id in convert.keys():
+        return convert[id]
+    return id
+
 # Write reports
 with open("Full report.txt", "w+") as f:
     for editor, acc in results.items():
-        f.writelines("Editor: "+editor+"   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+str(acc.Bytecount)+" bytes\n")
+        f.writelines("Editor: "+IDToName(editor)\n")
+        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+str(acc.Bytecount)+" bytes\n")
         for conseries in acc.ConList.List:
             f.writelines("   "+conseries)
         f.writelines("\n\n")
