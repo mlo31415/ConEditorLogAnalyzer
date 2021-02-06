@@ -155,5 +155,22 @@ with open("Con Series report.txt", "w+") as f:
         f.writelines("\n\n")
 
 
+with open("Con Instance report.txt", "w+") as f:
+    for editor, acc in results.items():
+        f.writelines("Editor: "+IDToName(editor)+"\n")
+        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
+        f.writelines("Conventions updated: ")
+        lst=list(acc.ConList.List.keys())
+        lst.sort()
+        for conseries in lst:
+            cons=list(acc.ConList.List[conseries].keys())
+            cons.sort()
+            separator: str=""
+            for con in cons:
+                f.writelines(separator+con)
+                separator=", "
+            f.writelines("\n")
+        f.writelines("\n\n")
+
 
 i=0
