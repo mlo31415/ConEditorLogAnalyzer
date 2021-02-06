@@ -2,6 +2,7 @@ from __future__ import annotations
 import datetime
 from typing import List, Dict
 import re
+import os
 from datetime import datetime
 
 from FTP import FTP
@@ -163,12 +164,34 @@ with open("Con Instance report.txt", "w+") as f:
         lst=list(acc.ConList.List.keys())
         lst.sort()
         for conseries in lst:
+            f.writelines(conseries+": ")
             cons=list(acc.ConList.List[conseries].keys())
             cons.sort()
             separator: str=""
             for con in cons:
                 f.writelines(separator+con)
                 separator=", "
+            f.writelines("\n")
+        f.writelines("\n\n")
+
+with open("Con detail report.txt", "w+") as f:
+    for editor, acc in results.items():
+        f.writelines("Editor: "+IDToName(editor)+"\n")
+        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
+        f.writelines("Conventions updated: ")
+        lst=list(acc.ConList.List.keys())
+        lst.sort()
+        for conseries in lst:
+            f.writelines(conseries+": \n")
+            cons=list(acc.ConList.List[conseries].keys())
+            cons.sort()
+            for con in cons:
+                f.writelines("   "+con+" -- ")
+                separator=""
+                for file in acc.ConList.List[conseries][con]:
+                    f.writelines(separator+os.path.splitext(file)[0])
+                    separator=", "
+                f.writelines("\n")
             f.writelines("\n")
         f.writelines("\n\n")
 
