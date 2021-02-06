@@ -143,7 +143,7 @@ def IDToName(id: str) -> str:
 # Write reports
 with open("Full report.txt", "w+") as f:
     for editor, acc in results.items():
-        f.writelines("Editor: "+IDToName(editor)\n")
+        f.writelines("Editor: "+IDToName(editor)+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+str(acc.Bytecount)+" bytes\n")
         for conseries in acc.ConList.List:
             f.writelines("Conventions updated: "+conseries)
