@@ -35,7 +35,7 @@ class Action():
 #       For this Dict, its key is the ConInstance name, its value is a list of files
 class Conlist():
     def __init__(self):
-        self.List: Dict={}
+        self.List: Dict[str, Dict[str, List[str]]]={}
         self.Itemcount: int=0
 
     def Append(self, Series: str="", Instance: str="", File: str=""):
@@ -122,8 +122,7 @@ except FileNotFoundError:
 # OK, we have turned the log file into the actions list
 # Now analyze the actions list
 # We'll create a dictionary of editors with the value bring the accumulators
-results={}  # Key is editor, value is an accumulator
-
+results: Dict[str, Accumulator]={}  # Key is editor, value is an accumulator
 for action in actions:
     if action.Editor not in results.keys():
         results[action.Editor]=Accumulator()
