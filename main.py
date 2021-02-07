@@ -104,8 +104,12 @@ for line in lines:
             datetimestring=m.groups()[2].split()
             date=datetime.strptime(" ".join(datetimestring[0:6]), "%A %B %d, %Y  %I:%M:%S %p")
         continue
+
     if line.startswith("ConEditor starting.   "):
-        m=re.match("ConEditor starting\.\s+\[(.+?)@fanac\.org\s", line)
+        continue
+
+    if line.startswith("^^deltas by "):
+        m=re.match("\^\^deltas by\s+(.+?)@fanac\.org:\s?", line)
         if m is not None:
             editor=m.groups()[0]
         continue
