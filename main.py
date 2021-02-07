@@ -11,7 +11,7 @@ from Log import Log, LogOpen
 class Action():
     def __init__(self):
         self.Date: datetime=None
-        self.Editor: str=""
+        self._editor: str=""
         self.ConSeries: str=""
         self.Convention: str=""
         self.Name: str=""
@@ -19,7 +19,7 @@ class Action():
         self.Bytes: int=0
 
     def IsEmpty(self) -> bool:
-        if len(self.Editor) > 0:
+        if len(self._Editor) > 0:
             return False
         if len(self.ConSeries) > 0:
             return False
@@ -30,6 +30,21 @@ class Action():
         if self.Date is not None:
             return False
         return True
+
+    @property
+    def Editor(self):
+        return self._editor
+    @Editor.setter
+    def Editor(self, e):
+        def IDToName(id: str) -> str:
+            convert={
+                "conpubs": "Mark Olson",
+                "cp-edie": "Edie Stern"
+            }
+            if id in convert.keys():
+                return convert[id]
+            return id
+        self._editor=IDToName(e)
 
 
 # Key is con series name; Value is Dict of con instance names.
@@ -134,19 +149,11 @@ for action in actions:
     acc.Bytecount+=action.Bytes
     acc.ConList.Append(action.ConSeries, action.Convention, action.Name)
 
-def IDToName(id: str) -> str:
-    convert={
-        "conpubs": "Mark Olson",
-        "cp-edie": "Edie Stern"
-    }
-    if id in convert.keys():
-        return convert[id]
-    return id
 
 # Write reports
 with open("Con Series report.txt", "w+") as f:
     for editor, acc in results.items():
-        f.writelines("Editor: "+IDToName(editor)+"\n")
+        f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
         f.writelines("Convention series updated: ")
         separator=""
@@ -160,7 +167,7 @@ with open("Con Series report.txt", "w+") as f:
 
 with open("Con Instance report.txt", "w+") as f:
     for editor, acc in results.items():
-        f.writelines("Editor: "+IDToName(editor)+"\n")
+        f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
         f.writelines("Conventions updated: ")
         lst=list(acc.ConList.List.keys())
@@ -178,7 +185,7 @@ with open("Con Instance report.txt", "w+") as f:
 
 with open("Con detail report.txt", "w+") as f:
     for editor, acc in results.items():
-        f.writelines("Editor: "+IDToName(editor)+"\n")
+        f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
         f.writelines("Conventions updated: ")
         lst=list(acc.ConList.List.keys())
