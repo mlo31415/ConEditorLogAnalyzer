@@ -210,6 +210,28 @@ with open("Con detail report.txt", "w+") as f:
             f.writelines("\n")
         f.writelines("\n\n")
 
+with open("Con detail report for Edie.txt", "w+") as f:
+    for editor, acc in results.items():
+        f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
+        f.writelines("Editor: "+editor+"\n")
+        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
+        f.writelines("Conventions updated: \n")
+        lst=list(acc.ConList.List.keys())
+        lst.sort()
+        for conseries in lst:
+            f.writelines(conseries+" <https://fanac.org/conpubs/"+conseries+">: \n")
+            cons=list(acc.ConList.List[conseries].keys())
+            cons.sort()
+            for con in cons:
+                f.writelines("   For "+con+", added ")
+                separator=""
+                for file in acc.ConList.List[conseries][con]:
+                    f.writelines(separator+os.path.splitext(file)[0])
+                    separator=", "
+                f.writelines("\n")
+            f.writelines("\n")
+        f.writelines("\n\n")
+
 # Write the timestamp
 lines=[]
 if os.path.exists("Last time.txt"):
