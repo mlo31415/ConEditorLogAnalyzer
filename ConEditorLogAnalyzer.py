@@ -129,7 +129,7 @@ for line in lines:
 
 # If we have a "Last time.txt" file, strip out all activity before that time.
 # This file is created at the end of processing, so that the next time ConEditorLogAnalyzer runs, it only lists new stuff.
-lines=[]
+startdatetime=datetime(year=2021, month=2, day=3)       # This is the start of the current version of the edit log
 try:
     with open("Last time.txt", "r") as f:
         lines=f.readlines()
@@ -153,10 +153,10 @@ for action in actions:
     acc.Bytecount+=action.Bytes
     acc.ConList.Append(action.ConSeries, action.Convention, action.Name)
 
-
 # Write reports
 with open("Con Series report.txt", "w+") as f:
     for editor, acc in results.items():
+        f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
         f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
         f.writelines("Convention series updated: ")
@@ -171,6 +171,7 @@ with open("Con Series report.txt", "w+") as f:
 
 with open("Con Instance report.txt", "w+") as f:
     for editor, acc in results.items():
+        f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
         f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
         f.writelines("Conventions updated: ")
@@ -189,9 +190,10 @@ with open("Con Instance report.txt", "w+") as f:
 
 with open("Con detail report.txt", "w+") as f:
     for editor, acc in results.items():
+        f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
         f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
-        f.writelines("Conventions updated: ")
+        f.writelines("Conventions updated: \n")
         lst=list(acc.ConList.List.keys())
         lst.sort()
         for conseries in lst:
