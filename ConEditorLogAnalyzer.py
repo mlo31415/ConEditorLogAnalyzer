@@ -212,14 +212,14 @@ with open("Con detail report.txt", "w+") as f:
 
 with open("Con detail report for Edie.txt", "w+") as f:
     for editor, acc in results.items():
-        f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
-        f.writelines("Editor: "+editor+"\n")
-        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
-        f.writelines("Conventions updated: \n")
+        f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
+        f.writelines("Editor: "+editor+"<p>\n")
+        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes<p>\n")
+        f.writelines("Conventions updated: <p>\n")
         lst=list(acc.ConList.List.keys())
         lst.sort()
         for conseries in lst:
-            f.writelines(conseries+" <https://fanac.org/conpubs/"+conseries+">: \n")
+            f.writelines("<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<p>\n")
             cons=list(acc.ConList.List[conseries].keys())
             cons.sort()
             for con in cons:
@@ -228,9 +228,9 @@ with open("Con detail report for Edie.txt", "w+") as f:
                 for file in acc.ConList.List[conseries][con]:
                     f.writelines(separator+os.path.splitext(file)[0])
                     separator=", "
-                f.writelines("\n")
-            f.writelines("\n")
-        f.writelines("\n\n")
+                f.writelines("<p>\n")
+            f.writelines("<p>\n")
+        f.writelines("<p><p>\n\n")
 
 # Write the timestamp
 lines=[]
