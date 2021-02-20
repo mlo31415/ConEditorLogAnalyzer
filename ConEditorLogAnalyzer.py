@@ -219,6 +219,8 @@ with open("Con detail report for Edie.txt", "w+") as f:
         lst=list(acc.ConList.List.keys())
         lst.sort()
         for conseries in lst:
+            if conseries.startswith("zz"):      # Skip since zzTest is the testing sandbox
+                continue
             f.writelines("<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<p>\n")
             cons=list(acc.ConList.List[conseries].keys())
             cons.sort()
