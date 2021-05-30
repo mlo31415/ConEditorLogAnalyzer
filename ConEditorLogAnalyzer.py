@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from dataclasses import dataclass
 import datetime
 from typing import List, Dict
 import re
@@ -64,11 +66,11 @@ class Conlist():
             self.Itemcount+=1
 
 
+@dataclass
 class Accumulator():
-    def __init__(self):
-        self.ConList: Conlist=Conlist()
-        self.Pagecount: int=0
-        self.Bytecount: int=0
+    ConList: Conlist=Conlist()
+    Pagecount: int=0
+    Bytecount: int=0
 
 
 #####################################################################
