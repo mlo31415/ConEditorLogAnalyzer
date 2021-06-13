@@ -98,7 +98,7 @@ coninstance=""
 date=None
 editor=""
 for line in lines:
-    # When we come across a line that starts "Uploaded ConInstance:", we save the con instance for use in any subsequenr actions
+    # When we come across a line that starts "Uploaded ConInstance:", we save the con instance for use in any subsequent actions
     if line.startswith("Uploaded ConInstance: "):
         m=re.match("Uploaded ConInstance: (.+?):(.+?)\s+\[conpubs@fanac.org\s+(.+?)]$", line)
         if m is not None:
