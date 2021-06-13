@@ -58,10 +58,8 @@ class Conlist():
 
     def Append(self, Series: str="", Instance: str="", File: str=""):
         if len(Series) > 0 and len(Instance) > 0 and len(File) > 0:
-            if Series not in self.List.keys():
-                self.List[Series]={}
-            if Instance not in self.List[Series].keys():
-                self.List[Series][Instance]=[]
+            self.List.setdefault(Series, {})
+            self.List[Series].setdefault(Instance, [])
             self.List[Series][Instance].append(File)
             self.Itemcount+=1
 
