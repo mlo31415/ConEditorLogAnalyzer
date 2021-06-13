@@ -149,8 +149,7 @@ except FileNotFoundError:
 # We'll create a dictionary of editors with the value bring the accumulators
 results: Dict[str, Accumulator]={}  # Key is editor, value is an accumulator
 for action in actions:
-    if action.Editor not in results.keys():
-        results[action.Editor]=Accumulator()
+    results.setdefault(action.Editor, Accumulator())
     acc=results[action.Editor]
     acc.Pagecount+=action.Pages
     acc.Bytecount+=action.Bytes
