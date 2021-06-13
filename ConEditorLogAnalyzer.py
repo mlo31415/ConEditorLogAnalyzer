@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import datetime
 from typing import List, Dict
 import re
@@ -68,7 +68,8 @@ class Conlist():
 
 @dataclass
 class Accumulator():
-    ConList: Conlist=Conlist()
+    #ConList: Conlist=Conlist()
+    ConList: Conlist=field(default_factory=Conlist)
     Pagecount: int=0
     Bytecount: int=0
 
