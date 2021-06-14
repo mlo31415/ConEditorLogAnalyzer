@@ -10,43 +10,35 @@ from datetime import datetime
 from FTP import FTP
 from Log import Log, LogOpen
 
+@dataclass
 class Action():
-    def __init__(self):
-        self.Date: datetime=None
-        self._editor: str=""
-        self.ConSeries: str=""
-        self.Convention: str=""
-        self.Name: str=""
-        self.Pages: int=0
-        self.Bytes: int=0
+    Date: datetime=None
+    _editor: str=""
+    ConSeries: str=""
+    Convention: str=""
+    Name: str=""
+    Pages: int=0
+    Bytes: int=0
 
-    def IsEmpty(self) -> bool:
-        if len(self._Editor) > 0:
-            return False
-        if len(self.ConSeries) > 0:
-            return False
-        if len(self.Convention) > 0:
-            return False
-        if len(self.Name) > 0:
-            return False
-        if self.Date is not None:
-            return False
-        return True
-
+    def IDToName(id: str) -> str:
+        convert={
+            "conpubs": "Mark Olson",
+            "cp-edie": "Edie Stern"
+        }
+        if id in convert.keys():
+            return convert[id]
+        return id
     @property
     def Editor(self):
         return self._editor
     @Editor.setter
-    def Editor(self, e):
-        def IDToName(id: str) -> str:
-            convert={
-                "conpubs": "Mark Olson",
-                "cp-edie": "Edie Stern"
-            }
-            if id in convert.keys():
-                return convert[id]
-            return id
-        self._editor=IDToName(e)
+    def Editor(self, val: str):
+        self._editor=val
+
+
+
+
+
 
 
 # Key is con series name; Value is Dict of con instance names.
@@ -126,6 +118,7 @@ for line in lines:
             action.Name=m.groups()[0]
             action.Bytes=int(m.groups()[1])
             action.Pages=int(m.groups()[2])
+
         actions.append(action)
 
 # If we have a "Last time.txt" file, strip out all activity before that time.
