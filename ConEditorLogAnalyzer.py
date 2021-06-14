@@ -118,7 +118,10 @@ for line in lines:
             action.Name=m.groups()[0]
             action.Bytes=int(m.groups()[1])
             action.Pages=int(m.groups()[2])
-
+        m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=(\d*);", line)
+        if m is not None:
+            action.Name=m.groups()[0]
+            action.Bytes=int(m.groups()[1])
         actions.append(action)
 
 # If we have a "Last time.txt" file, strip out all activity before that time.
