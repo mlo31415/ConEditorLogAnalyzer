@@ -74,7 +74,7 @@ if not f.OpenConnection("FTP Credentials.json"):
     Log("Main: OpenConnection('FTP Credentials.json' failed")
     exit(0)
 
-lines=FTP().GetFileAsString("", "updatelog.txt").replace("/n", "").split("\n")
+lines: List[str]=FTP().GetFileAsString("", "updatelog.txt").replace("/n", "").split("\n")
 
 actions: List[Action]=[]
 
@@ -83,10 +83,10 @@ actions: List[Action]=[]
 #   followed by one or more lines which might include this type:
 #       >>add: Source=<name>; Sitename=<name>; Display=<name>; URL=<url>; Size=<num>; Pages=<num>
 isinUpload: bool=False
-conseries=""
-coninstance=""
-date=None
-editor=""
+conseries: str=""
+coninstance: str=""
+date: datetime=None
+editor: str=""
 for line in lines:
     # When we come across a line that starts "Uploaded ConInstance:", we save the con instance for use in any subsequent actions
     if line.startswith("Uploaded ConInstance: "):
