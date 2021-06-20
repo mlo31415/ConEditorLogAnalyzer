@@ -136,18 +136,25 @@ except FileNotFoundError:
 # OK, we have turned the log file into the actions list
 # Now analyze the actions list
 # We'll create a dictionary of editors with the value being the accumulators
-results: Dict[str, Accumulator]={}  # Key is editor, value is an accumulator
+resultsByEditor: Dict[str, Accumulator]={}  # Key is editor, value is an accumulator
 for action in actions:
     ed=Action.IDToName(action.Editor)
-    results.setdefault(ed, Accumulator())
-    acc=results[ed]
+    resultsByEditor.setdefault(ed, Accumulator())
+    acc=resultsByEditor[ed]
     acc.Pagecount+=action.Pages
     acc.Bytecount+=action.Bytes
     acc.ConList.Append(action.ConSeries, action.Convention, action.Name)
 
+# Do a second one with the editors merged
+resultsTotal=Accumulator()
+for action in actions:
+    resultsTotal.Pagecount+=action.Pages
+    resultsTotal.Bytecount+=action.Bytes
+    resultsTotal.ConList.Append(action.ConSeries, action.Convention, action.Name)
+
 # Write reports
 with open("Con Series report.txt", "w+") as f:
-    for editor, acc in results.items():
+    for editor, acc in resultsByEditor.items():
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
         f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
@@ -162,7 +169,7 @@ with open("Con Series report.txt", "w+") as f:
 
 
 with open("Con Instance report.txt", "w+") as f:
-    for editor, acc in results.items():
+    for editor, acc in resultsByEditor.items():
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
         f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
@@ -181,7 +188,7 @@ with open("Con Instance report.txt", "w+") as f:
         f.writelines("\n\n")
 
 with open("Con detail report.txt", "w+") as f:
-    for editor, acc in results.items():
+    for editor, acc in resultsByEditor.items():
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
         f.writelines("Editor: "+editor+"\n")
         f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
@@ -202,16 +209,17 @@ with open("Con detail report.txt", "w+") as f:
             f.writelines("\n")
         f.writelines("\n\n")
 
-with open("Con detail report for Edie.txt", "w+") as f:
-    for editor, acc in results.items():
+with open("Con detail report for Edie (old).txt", "w+") as f:
+    for editor, acc in resultsByEditor.items():
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
         f.writelines("Editor: "+editor+"<p>\n")
-        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes<p>\n")
+        f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(
+            acc.Bytecount)+" bytes<p>\n")
         f.writelines("Conventions updated: <p>\n")
         lst=list(acc.ConList.List.keys())
         lst.sort()
         for conseries in lst:
-            if conseries.startswith("zz"):      # Skip since zzTest is the testing sandbox
+            if conseries.startswith("zz"):  # Skip since zzTest is the testing sandbox
                 continue
             f.writelines("<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<p>\n")
             cons=list(acc.ConList.List[conseries].keys())
@@ -225,6 +233,27 @@ with open("Con detail report for Edie.txt", "w+") as f:
                 f.writelines("<p>\n")
             f.writelines("<p>\n")
         f.writelines("<p><p>\n\n")
+
+with open("Con detail report for Edie.txt", "w+") as f:
+    f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
+    f.writelines("Conventions updated: <p>\n")
+    lst=list(resultsTotal.ConList.List.keys())
+    lst.sort()
+    for conseries in lst:
+        if conseries.startswith("zz"):      # Skip since zzTest is the testing sandbox
+            continue
+        f.writelines("<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<p>\n")
+        cons=list(resultsTotal.ConList.List[conseries].keys())
+        cons.sort()
+        for con in cons:
+            f.writelines("   For "+con+", added ")
+            separator=""
+            for file in resultsTotal.ConList.List[conseries][con]:
+                f.writelines(separator+os.path.splitext(file)[0])
+                separator=", "
+            f.writelines("<p>\n")
+        f.writelines("<p>\n")
+    f.writelines("<p><p>\n\n")
 
 # Write the timestamp
 lines=[]
