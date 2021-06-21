@@ -242,18 +242,18 @@ with open("Con detail report for Edie.txt", "w+") as f:
     for conseries in lst:
         if conseries.startswith("zz"):      # Skip since zzTest is the testing sandbox
             continue
-        f.writelines("<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<p>\n")
+        f.writelines("--<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<br>\n")
         cons=list(resultsTotal.ConList.List[conseries].keys())
         cons.sort()
         for con in cons:
-            f.writelines("   For "+con+", added ")
+            f.writelines("---"+con+" added ")
             separator=""
             for file in resultsTotal.ConList.List[conseries][con]:
                 f.writelines(separator+os.path.splitext(file)[0])
                 separator=", "
-            f.writelines("<p>\n")
-        f.writelines("<p>\n")
-    f.writelines("<p><p>\n\n")
+            f.writelines("<br>\n")
+        f.writelines("<br>\n")
+    f.writelines("\n")
 
 # Write the timestamp
 lines=[]
