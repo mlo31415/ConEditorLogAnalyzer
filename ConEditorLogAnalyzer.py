@@ -238,7 +238,9 @@ with open("Con detail report for Edie.txt", "w+") as f:
     f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
     f.writelines("Conventions updated: <p>\n")
     lst=list(resultsTotal.ConList.List.keys())
-    lst.sort()
+    def WorldconFirst(e):
+        return e if e != "Worldcon" else " "
+    lst.sort(key=WorldconFirst)
     for conseries in lst:
         if conseries.startswith("zz"):      # Skip since zzTest is the testing sandbox
             continue
