@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from collections import defaultdict
 import datetime
 from typing import List, Dict
 import re
@@ -40,13 +41,11 @@ class Action():
 #       For this Dict, its key is the ConInstance name, its value is a list of files
 class Conlist():
     def __init__(self):
-        self.List: Dict[str, Dict[str, List[str]]]={}
+        self.List: Dict[str, Dict[str, List[str]]]=defaultdict(lambda: defaultdict(list))
         self.Itemcount: int=0
 
     def Append(self, Series: str="", Instance: str="", File: str=""):
         if len(Series) > 0 and len(Instance) > 0 and len(File) > 0:
-            self.List.setdefault(Series, {})
-            self.List[Series].setdefault(Instance, [])
             self.List[Series][Instance].append(File)
             self.Itemcount+=1
 
@@ -136,10 +135,9 @@ except FileNotFoundError:
 # OK, we have turned the log file into the actions list
 # Now analyze the actions list
 # We'll create a dictionary of editors with the value being the accumulators
-resultsByEditor: Dict[str, Accumulator]={}  # Key is editor, value is an accumulator
+resultsByEditor: Dict[str, Accumulator]=defaultdict(Accumulator)  # Key is editor, value is an accumulator
 for action in actions:
     ed=Action.IDToName(action.Editor)
-    resultsByEditor.setdefault(ed, Accumulator())
     acc=resultsByEditor[ed]
     acc.Pagecount+=action.Pages
     acc.Bytecount+=action.Bytes
