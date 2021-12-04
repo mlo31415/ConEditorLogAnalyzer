@@ -10,6 +10,7 @@ from datetime import datetime
 
 from FTP import FTP
 from Log import Log, LogOpen
+from HelpersPackage import IsFileWriteable, IsFileReadonly
 
 @dataclass
 class Action():
@@ -118,19 +119,21 @@ for line in lines:
             action.Bytes=int(m.groups()[1])
         actions.append(action)
 
-# If we have a "Last time.txt" file, strip out all activity before that time.
-# This file is created at the end of processing, so that the next time ConEditorLogAnalyzer runs, it only lists new stuff.
-startdatetime=datetime(year=2021, month=2, day=3)       # This is the start of the current version of the edit log
-try:
-    with open("Last time.txt", "r") as f:
-        lines=f.readlines()
-        lines=[l.strip() for l in lines if len(l.strip()) > 0 and l.strip()[0] != "#"]    # Remove empty lines and lines starting with "#"
-    if len(lines) > 0:
-        startdatetime=datetime.strptime(lines[0], "%B %d, %Y  %I:%M:%S %p")
-        # Remove all actions occuring before startdatetime
-        actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
-except FileNotFoundError:
-    pass
+    # If we have a "Last time.txt" file, strip out all activity before that time.
+    # This file is created at the end of processing, so that the next time ConEditorLogAnalyzer runs, it only lists new stuff.
+    startdatetime=datetime(year=2021, month=2, day=3)       # This is the start of the current version of the edit log
+
+    if IsFileWriteable("Last time.txt"):
+        with open("Last time.txt", "r") as f:
+            lines=f.readlines()
+            lines=[l.strip() for l in lines if len(l.strip()) > 0 and l.strip()[0] != "#"]    # Remove empty lines and lines starting with "#"
+        if len(lines) > 0:
+            startdatetime=datetime.strptime(lines[0], "%B %d, %Y  %I:%M:%S %p")
+            # Remove all actions occuring before startdatetime
+            actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
+    else:
+        Log("\n*** Last time.txt is read-only!\n\n")
+
 
 # OK, we have turned the log file into the actions list
 # Now analyze the actions list
