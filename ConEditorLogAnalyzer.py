@@ -130,6 +130,8 @@ def main():
     startdatetime=datetime(year=2021, month=2, day=3)       # This is the start of the current version of the edit log
 
     if IsFileReadonly("Last time.txt"):
+        Log("\n*** Last time.txt is read-only!\n\n")
+    else:
         with open("Last time.txt", "r") as f:
             lines=f.readlines()
             lines=[l.strip() for l in lines if len(l.strip()) > 0 and l.strip()[0] != "#"]    # Remove empty lines and lines starting with "#"
@@ -137,8 +139,7 @@ def main():
             startdatetime=datetime.strptime(lines[0], "%B %d, %Y  %I:%M:%S %p")
             # Remove all actions occuring before startdatetime
             actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
-    else:
-        Log("\n*** Last time.txt is read-only!\n\n")
+
 
 
     # OK, we have turned the log file into the actions list
