@@ -217,7 +217,7 @@ def main():
                 f.writelines("\n")
             f.writelines("\n\n")
 
-    with open("Con detail report for Edie (old).txt", "w+") as f:
+    with open("Con detail report for Edie (old format).txt", "w+") as f:
         for editor, acc in resultsByEditor.items():
             f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
             f.writelines("Editor: "+editor+"<p>\n")
