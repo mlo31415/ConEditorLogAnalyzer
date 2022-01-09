@@ -131,14 +131,13 @@ def main():
 
     if IsFileReadonly("Last time.txt"):
         Log("\n*** Last time.txt is read-only!\n\n")
-    else:
-        with open("Last time.txt", "r") as f:
-            lines=f.readlines()
-            lines=[l.strip() for l in lines if len(l.strip()) > 0 and l.strip()[0] != "#"]    # Remove empty lines and lines starting with "#"
-        if len(lines) > 0:
-            startdatetime=datetime.strptime(lines[0], "%B %d, %Y  %I:%M:%S %p")
-            # Remove all actions occuring before startdatetime
-            actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
+    with open("Last time.txt", "r") as f:
+        lines=f.readlines()
+        lines=[l.strip() for l in lines if len(l.strip()) > 0 and l.strip()[0] != "#"]    # Remove empty lines and lines starting with "#"
+    if len(lines) > 0:
+        startdatetime=datetime.strptime(lines[0], "%B %d, %Y  %I:%M:%S %p")
+        # Remove all actions occuring before startdatetime
+        actions=[a for a in actions if a.Date is not None and a.Date > startdatetime]
 
 
 
