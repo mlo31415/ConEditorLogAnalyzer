@@ -248,8 +248,17 @@ def main():
         def WorldconFirst(e):
             return e if e != "Worldcon" else " "
         lst.sort(key=WorldconFirst)
+
+        def IsSandbox(con: str) -> bool:
+            return con.lower().startswith("xx") or con.lower().startswith("yy") or con.lower().startswith("zz")
+
+        # Output structure:
+        #   ---Conseries
+        #       Con 'added' list of items
+        # There's special code to merge the Conseries to the con when we only added material for a single con in that series
+        # When a conseries is present, it is a link to the con series index page.  When it's a single con, there is a link to that con's page
         for conseries in lst:
-            if conseries.lower().startswith("xx") or conseries.lower().startswith("yy") or conseries.lower().startswith("zz"):      # Skip since these are the testing sandboxes
+            if IsSandbox(conseries):      # Skip since these are the testing sandboxes
                 continue
             f.writelines("--<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<br>\n")
             cons=list(resultsTotal.ConList.List[conseries].keys())
