@@ -10,7 +10,7 @@ from datetime import datetime
 
 from FTP import FTP
 from Log import Log, LogOpen
-from HelpersPackage import IsFileWriteable, IsFileReadonly
+from HelpersPackage import IsFileWriteable, IsFileReadonly, FormatLink2
 
 @dataclass
 class Action():
@@ -216,34 +216,10 @@ def main():
                 f.writelines("\n")
             f.writelines("\n\n")
 
-    with open("Con detail report for Edie (old format).txt", "w+") as f:
-        for editor, acc in resultsByEditor.items():
-            f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
-            f.writelines("Editor: "+editor+"<p>\n")
-            f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(
-                acc.Bytecount)+" bytes<p>\n")
-            f.writelines("Conventions updated: <p>\n")
-            lst=list(acc.ConList.List.keys())
-            lst.sort()
-            for conseries in lst:
-                if conseries.startswith("zz"):  # Skip since zzTest is the testing sandbox
-                    continue
-                f.writelines("<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<p>\n")
-                cons=list(acc.ConList.List[conseries].keys())
-                cons.sort()
-                for con in cons:
-                    f.writelines("   For "+con+", added ")
-                    separator=""
-                    for file in acc.ConList.List[conseries][con]:
-                        f.writelines(separator+os.path.splitext(file)[0])
-                        separator=", "
-                    f.writelines("<p>\n")
-                f.writelines("<p>\n")
-            f.writelines("<p><p>\n\n")
-
     with open("Con detail report for Edie.txt", "w+") as f:
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
         f.writelines("Conpubs: Unless otherwise noted, all scans are by Mark Olson.<br>\n")
+
         lst=list(resultsTotal.ConList.List.keys())
         def WorldconFirst(e) -> bool:
             return e if e != "Worldcon" else " "
@@ -251,6 +227,14 @@ def main():
 
         def IsSandbox(con: str) -> bool:
             return con.lower().startswith("xx") or con.lower().startswith("yy") or con.lower().startswith("zz")
+
+        def WriteFileList(files, added, f):
+            f.writelines(f"---{added} added ")
+            separator=""
+            for file in files:
+                f.writelines(separator+os.path.splitext(file)[0])
+                separator=", "
+            f.writelines("<br>\n")
 
         # Output structure:
         #   ---Conseries
@@ -260,16 +244,21 @@ def main():
         for conseries in lst:
             if IsSandbox(conseries):      # Skip since these are the testing sandboxes
                 continue
-            f.writelines("--<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<br>\n")
+
             cons=list(resultsTotal.ConList.List[conseries].keys())
-            cons.sort()
-            for con in cons:
-                f.writelines("---"+con+" added ")
-                separator=""
-                for file in resultsTotal.ConList.List[conseries][con]:
-                    f.writelines(separator+os.path.splitext(file)[0])
-                    separator=", "
-                f.writelines("<br>\n")
+
+            if len(cons) == 1:
+                # Special case when there is only one con in the list for this con series
+                con=cons[0]
+                added=FormatLink2(f"fanac.org/conpubs/{conseries}/{con}", con)
+                WriteFileList(resultsTotal.ConList.List[conseries][con], added, f)
+            else:
+                link=FormatLink2(f"//fanac.org/conpubs/{conseries}", conseries)
+                f.writelines(f"--{link}:<br>\n")
+
+                cons.sort()
+                for con in cons:
+                    WriteFileList(resultsTotal.ConList.List[conseries][con], con, f)
             f.writelines("<br>\n")
         f.writelines("\n")
 
@@ -290,6 +279,7 @@ def main():
                     f.writelines(line+"\n")
                     continue
             f.writelines(datetime.now().strftime("%B %d, %Y  %I:%M:%S %p")+"\n")
+
 
 
 if __name__ == "__main__":
