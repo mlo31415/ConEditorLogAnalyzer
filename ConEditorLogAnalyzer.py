@@ -244,13 +244,13 @@ def main():
 
     with open("Con detail report for Edie.txt", "w+") as f:
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
-        f.writelines("Conventions updated: <p>\n")
+        f.writelines("Conpubs: Unless otherwise noted, all scans are by Mark Olson.<br>\n")
         lst=list(resultsTotal.ConList.List.keys())
         def WorldconFirst(e):
             return e if e != "Worldcon" else " "
         lst.sort(key=WorldconFirst)
         for conseries in lst:
-            if conseries.startswith("zz"):      # Skip since zzTest is the testing sandbox
+            if conseries.lower().startswith("xx") or conseries.lower().startswith("yy") or conseries.lower().startswith("zz"):      # Skip since these are the testing sandboxes
                 continue
             f.writelines("--<a href=https://fanac.org/conpubs/"+conseries+">"+conseries+"</a>:<br>\n")
             cons=list(resultsTotal.ConList.List[conseries].keys())
