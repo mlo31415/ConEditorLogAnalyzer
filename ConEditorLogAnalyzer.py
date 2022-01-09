@@ -245,7 +245,7 @@ def main():
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
         f.writelines("Conpubs: Unless otherwise noted, all scans are by Mark Olson.<br>\n")
         lst=list(resultsTotal.ConList.List.keys())
-        def WorldconFirst(e):
+        def WorldconFirst(e) -> bool:
             return e if e != "Worldcon" else " "
         lst.sort(key=WorldconFirst)
 
