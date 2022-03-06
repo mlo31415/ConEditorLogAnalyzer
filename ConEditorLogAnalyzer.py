@@ -253,7 +253,7 @@ def main():
                 added=FormatLink2(f"fanac.org/conpubs/{conseries}/{con}", con)
                 WriteFileList(resultsTotal.ConList.List[conseries][con], added, f)
             else:
-                link=FormatLink2(f"//fanac.org/conpubs/{conseries}", conseries)
+                link=FormatLink2(f"fanac.org/conpubs/{conseries}", conseries)
                 f.writelines(f"--{link}:<br>\n")
 
                 cons.sort()
