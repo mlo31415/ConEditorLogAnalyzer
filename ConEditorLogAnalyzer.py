@@ -10,7 +10,8 @@ from datetime import datetime
 
 from FTP import FTP
 from Log import Log, LogOpen
-from HelpersPackage import IsFileWriteable, IsFileReadonly, FormatLink2
+from HelpersPackage import IsFileWriteable, IsFileReadonly, FormatLink2, SortMessyNumber
+
 
 @dataclass
 class Action():
@@ -194,6 +195,16 @@ def main():
                 f.writelines("\n")
             f.writelines("\n\n")
 
+    # Take names line Boskone 2 and Boskone 11 pad the numbers so they sort numerically
+    # We only deal with <name> <num> -- everything else is used as-is
+    def ConNameSortKey(s: str) -> str:
+        name=s.strip().split(" ")
+        if len(name) != 2:
+            return s
+        val=int(SortMessyNumber(name[1]))
+        return f"{name[0]} {val:2}"
+
+
     with open("Con detail report.txt", "w+") as f:
         for editor, acc in resultsByEditor.items():
             f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
@@ -205,7 +216,7 @@ def main():
             for conseries in lst:
                 f.writelines(conseries+": \n")
                 cons=list(acc.ConList.List[conseries].keys())
-                cons.sort()
+                cons.sort(key=lambda x: ConNameSortKey(x))
                 for con in cons:
                     f.writelines("   "+con+" -- ")
                     separator=""
@@ -256,7 +267,7 @@ def main():
                 link=FormatLink2(f"fanac.org/conpubs/{conseries}", conseries)
                 f.writelines(f"--{link}:<br>\n")
 
-                cons.sort()
+                cons.sort(key=lambda x: ConNameSortKey(x))
                 for con in cons:
                     WriteFileList(resultsTotal.ConList.List[conseries][con], con, f)
             f.writelines("<br>\n")
