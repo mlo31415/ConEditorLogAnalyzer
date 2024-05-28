@@ -10,7 +10,7 @@ from datetime import datetime
 
 from FTP import FTP
 from Log import Log, LogOpen
-from HelpersPackage import IsFileWriteable, IsFileReadonly, FormatLink2, SortMessyNumber
+from HelpersPackage import IsFileWriteable, IsFileReadonly, FormatLink2, SortMessyNumber, Float0, Int0
 
 
 @dataclass
@@ -104,27 +104,68 @@ def main():
                 editor=m.groups()[0]
             continue
 
+        #----------------------------
+        # Take number is bytes or megabytes and yield bytes
+        # This is decidedly a heuristic...
+        def InterpretSize(num: str, pages: int|None=None)-> int:
+            # Is this explicitly a float?  Then it must be in MB. Convert to bytes and return
+            if "." in num:
+                return int(Float0(num)*1024*1024)
+
+            # It's an integer.
+            num=Int0(num)
+            # If it's big, it's definitely in bytes
+            if num > 200:
+                return num
+            # Now we have a relatively small number which could be either.  Try to use the page count (if supplied) to decide
+            if pages is not None and pages < 3:
+                # It might be a small text file a few bytes in size
+                # Small page count + small byte count.  Probably it's in bytes
+                return num
+
+            # Unknown page count, small size.  Probably MB
+            return num*1024*1024    # Small page
+        #----------------------------
+
+
         if line.startswith(">>add: "):
             action=Action()
             action.ConSeries=conseries
             action.Convention=coninstance
             action.Editor=editor
             action.Date=date
-            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=(\d*); Pages=(\d*);", line)
+            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=([0-9.]*); Pages=(\d*);", line)
             if m is not None:
                 action.Name=m.groups()[0]
-                action.Bytes=int(m.groups()[1])
                 action.Pages=int(m.groups()[2])
-            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=(\d*); Pages=(\d*);", line)
+                action.Bytes=InterpretSize(m.groups()[1], action.Pages)
+                actions.append(action)
+                continue
+            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=([0-9.]*); Pages=(\d*);", line)
             if m is not None:
                 action.Name=m.groups()[0]
-                action.Bytes=int(m.groups()[1])
                 action.Pages=int(m.groups()[2])
-            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=(\d*);", line)
+                action.Bytes=InterpretSize(m.groups()[1], action.Pages)
+                actions.append(action)
+                continue
+            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=([0-9.]);", line)
             if m is not None:
                 action.Name=m.groups()[0]
-                action.Bytes=int(m.groups()[1])
-            actions.append(action)
+                action.Bytes=InterpretSize(m.groups()[1])
+                actions.append(action)
+                continue
+            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=([0-9.]*);", line)
+            if m is not None:
+                action.Name=m.groups()[0]
+                action.Bytes=InterpretSize(m.groups()[1])
+                continue
+            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Pages=(\d*);", line)
+            if m is not None:
+                action.Name=m.groups()[0]
+                action.Pages=int(m.groups()[1])
+                actions.append(action)
+                continue
+            i=0
 
     # If we have a "Last time.txt" file, strip out all activity before that time.
     # This file is created at the end of processing, so that the next time ConEditorLogAnalyzer runs, it only lists new stuff.
