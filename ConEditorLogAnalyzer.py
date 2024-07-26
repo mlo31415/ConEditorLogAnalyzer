@@ -94,7 +94,7 @@ def main():
                 date=datetime.strptime(" ".join(datetimestring[0:6]), "%A %B %d, %Y  %I:%M:%S %p")
             continue
 
-        if line.startswith("ConEditor starting.   "):
+        if line.startswith("ConEditor starting. "):
             continue
 
         if line.startswith("^^deltas by "):
