@@ -86,7 +86,7 @@ def main():
     for line in lines:
         # When we come across a line that starts "Uploaded ConInstance:", we save the con instance for use in any subsequent actions
         if line.startswith("Uploaded ConInstance: "):
-            m=re.match("Uploaded ConInstance: (.+?):(.+?)\s+\[[a-zA-Z\-]+@fanac.org\s+(.+?)]$", line)
+            m=re.match(r"Uploaded ConInstance: (.+?):(.+?)\s+\[[a-zA-Z\-]+@fanac.org\s+(.+?)]$", line)
             if m is not None:
                 conseries=m.groups()[0]
                 coninstance=m.groups()[1]
@@ -98,7 +98,7 @@ def main():
             continue
 
         if line.startswith("^^deltas by "):
-            m=re.match("\^\^deltas by\s+(.+?)@fanac\.org:\s?", line)
+            m=re.match(r"\^\^deltas by\s+(.+?)@fanac\.org:\s?", line)
             if m is not None:
                 editor=m.groups()[0]
             continue
