@@ -155,9 +155,9 @@ def main():
     # Write reports
     with open("Con Series report.txt", "w+") as f:
         for editor, acc in resultsByEditor.items():
-            f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
-            f.writelines("Editor: "+editor+"\n")
-            f.writelines("   "+str(acc.ConList.Itemcount)+" items,   "+str(acc.Pagecount)+" pages,   "+"{:,}".format(acc.Bytecount)+" bytes\n")
+            f.writelines(f'{startdatetime.strftime("%B %d, %Y")} -- {datetime.now().strftime("%B %d, %Y")}\n\n')
+            f.writelines(f"Editor: {editor}\n")
+            f.writelines(f"   {acc.ConList.Itemcount} items,   {acc.Pagecount} pages,   {'{:,}'.format(acc.Bytecount)} bytes\n")
             f.writelines("Convention series updated: ")
             separator=""
             lst=list(acc.ConList.List.keys())
