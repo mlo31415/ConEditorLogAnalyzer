@@ -157,6 +157,7 @@ def main():
             if m is not None:
                 action.Name=m.groups()[0]
                 action.Bytes=InterpretSize(m.groups()[1])
+                actions.append(action)
                 continue
             m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Pages=(\d*);", line)
             if m is not None:
