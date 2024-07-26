@@ -79,7 +79,6 @@ def main():
     #       "Uploaded ConInstance: <conseries>;<coninstance> [conpubs@fanac.org <datetime>]
     #   followed by one or more lines which might include this type:
     #       >>add: Source=<name>; Sitename=<name>; Display=<name>; URL=<url>; Size=<num>; Pages=<num>
-    isinUpload: bool=False
     conseries: str=""
     coninstance: str=""
     date: datetime=None
