@@ -13,55 +13,6 @@ from Log import Log, LogOpen
 from HelpersPackage import IsFileWriteable, IsFileReadonly, FormatLink2, SortMessyNumber, Float0, Int0
 
 
-@dataclass
-class Action():
-    Date: datetime=None
-    _editor: str=""
-    ConSeries: str=""
-    Convention: str=""
-    Name: str=""
-    Pages: int=0
-    Bytes: int=0
-
-    def IDToName(id: str) -> str:
-        convert={
-            "conpubs": "Mark Olson",
-            "cp-edie": "Edie Stern"
-        }
-        if id in convert.keys():
-            return convert[id]
-        return id
-    @property
-    def Editor(self):
-        return self._editor
-    @Editor.setter
-    def Editor(self, val: str):
-        self._editor=val
-
-
-# Key is con series name; Value is Dict of con instance names.
-#       For this Dict, its key is the ConInstance name, its value is a list of files
-class Conlist():
-    def __init__(self):
-        self.List: Dict[str, Dict[str, List[str]]]=defaultdict(lambda: defaultdict(list))
-        self.Itemcount: int=0
-
-    def Append(self, Series: str="", Instance: str="", File: str=""):
-        if len(Series) > 0 and len(Instance) > 0 and len(File) > 0:
-            self.List[Series][Instance].append(File)
-            self.Itemcount+=1
-
-
-@dataclass
-class Accumulator():
-    #ConList: Conlist=Conlist()
-    ConList: Conlist=field(default_factory=Conlist)
-    Pagecount: int=0
-    Bytecount: int=0
-
-
-#####################################################################
-
 def main():
     LogOpen("Log -- ConEditorLogAnalyzer.txt", "Log (Errors) -- ConEditorLogAnalyzer.txt")
 
@@ -331,6 +282,57 @@ def main():
                     f.writelines(line+"\n")
                     continue
             f.writelines(datetime.now().strftime("%B %d, %Y  %I:%M:%S %p")+"\n")
+
+
+
+@dataclass
+class Action():
+    Date: datetime=None
+    _editor: str=""
+    ConSeries: str=""
+    Convention: str=""
+    Name: str=""
+    Pages: int=0
+    Bytes: int=0
+
+    def IDToName(id: str) -> str:
+        convert={
+            "conpubs": "Mark Olson",
+            "cp-edie": "Edie Stern"
+        }
+        if id in convert.keys():
+            return convert[id]
+        return id
+    @property
+    def Editor(self):
+        return self._editor
+    @Editor.setter
+    def Editor(self, val: str):
+        self._editor=val
+
+
+# Key is con series name; Value is Dict of con instance names.
+#       For this Dict, its key is the ConInstance name, its value is a list of files
+class Conlist():
+    def __init__(self):
+        self.List: Dict[str, Dict[str, List[str]]]=defaultdict(lambda: defaultdict(list))
+        self.Itemcount: int=0
+
+    def Append(self, Series: str="", Instance: str="", File: str=""):
+        if len(Series) > 0 and len(Instance) > 0 and len(File) > 0:
+            self.List[Series][Instance].append(File)
+            self.Itemcount+=1
+
+
+@dataclass
+class Accumulator():
+    #ConList: Conlist=Conlist()
+    ConList: Conlist=field(default_factory=Conlist)
+    Pagecount: int=0
+    Bytecount: int=0
+
+
+#####################################################################
 
 
 
