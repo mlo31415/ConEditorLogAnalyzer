@@ -84,14 +84,14 @@ def main():
             action.Convention=coninstance
             action.Editor=editor
             action.Date=date
-            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=([0-9.]*); Pages=(\d*);", line)
+            m=re.match(r">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=([0-9.]*); Pages=(\d*);", line)
             if m is not None:
                 action.Name=m.groups()[0]
                 action.Pages=int(m.groups()[2])
                 action.Bytes=InterpretSize(m.groups()[1], action.Pages)
                 actions.append(action)
                 continue
-            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=([0-9.]*); Pages=(\d*);", line)
+            m=re.match(r">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=([0-9.]*); Pages=(\d*);", line)
             if m is not None:
                 action.Name=m.groups()[0]
                 action.Pages=int(m.groups()[2])
@@ -110,7 +110,7 @@ def main():
                 action.Bytes=InterpretSize(m.groups()[1])
                 actions.append(action)
                 continue
-            m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Pages=(\d*);", line)
+            m=re.match(r">>add: Source=.+?; Sitename=.+?; Display=(.+?); Pages=(\d*);", line)
             if m is not None:
                 action.Name=m.groups()[0]
                 action.Pages=int(m.groups()[1])
