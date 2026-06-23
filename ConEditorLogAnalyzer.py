@@ -267,12 +267,15 @@ def main():
 
     # If the file is writeable, write the timestamp
     # (The file is commonly set to read-only during debugging.)
+    # Only advance the timestamp when we actually processed at least one action.  A run that
+    # parsed nothing (e.g. an empty/malformed log) must not move the watermark forward and
+    # silently swallow that window.
     lines=[]
     if os.path.exists("Last time.txt"):
         with open("Last time.txt", "r") as f:
             lines=f.readlines()
 
-    if IsFileWriteable("Last time.txt"):
+    if actions and IsFileWriteable("Last time.txt"):
         with open("Last time.txt", "w") as f:
             # Rewrite the file, replacing the date line (if one is present)
             # Basically, we preserve empty lines and lines with '#" is the first non-blank character and replace the first line of any other type with the datetime
