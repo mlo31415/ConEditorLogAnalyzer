@@ -134,6 +134,20 @@ def main():
 
 
 
+    # Collapse duplicate actions created by repeated uploads of the same con instance.
+    # ConEditor re-logs the entire current file list as ">>add:" on every upload, so an
+    # instance uploaded N times produces N identical actions per file.  Keep one per unique
+    # (ConSeries, Convention, Name, Pages, Bytes) -- size+pages distinguish genuinely
+    # different files that happen to share a display name (e.g. two files both shown "Flyer").
+    seen=set()
+    deduped: List[Action]=[]
+    for a in actions:
+        key=(a.ConSeries, a.Convention, a.Name, a.Pages, a.Bytes)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(a)
+    actions=deduped
+
     # OK, we have turned the log file into the actions list
     # Now analyze the actions list
     # We'll create a dictionary of editors with the value being the accumulators
