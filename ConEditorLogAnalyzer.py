@@ -34,6 +34,18 @@ def main():
     coninstance: str=""
     date: datetime=None
     editor: str=""
+
+    # Strip the file extension from the Display name and append any Notes field in parentheses.
+    # Some source notes already carry their own parens, so don't double-wrap those.
+    def FinalizeName(display: str, note: str) -> str:
+        name=os.path.splitext(display)[0]
+        note=note.strip()
+        if not note:
+            return name
+        if note.startswith("(") and note.endswith(")"):
+            return f"{name} {note}"
+        return f"{name} ({note})"
+
     for line in lines:
         # When we come across a line that starts "Uploaded ConInstance:", we save the con instance for use in any subsequent actions
         if line.startswith("Uploaded ConInstance: "):
@@ -84,35 +96,44 @@ def main():
             action.Convention=coninstance
             action.Editor=editor
             action.Date=date
+
+            # Pull out the optional "Notes=..." field so it doesn't bleed into the Display capture
+            # below (the field regexes don't know about it).  FinalizeName re-appends it in parens.
+            note=""
+            mn=re.search(r"; Notes=(.*?)(?=; (?:URL|Size|Pages)=)", line)
+            if mn is not None:
+                note=mn.groups()[0]
+                line=line[:mn.start()]+line[mn.end():]
+
             m=re.match(r">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=([0-9.]*); Pages=(\d*);", line)
             if m is not None:
-                action.Name=m.groups()[0]
+                action.Name=FinalizeName(m.groups()[0], note)
                 action.Pages=int(m.groups()[2])
                 action.Bytes=InterpretSize(m.groups()[1], action.Pages)
                 actions.append(action)
                 continue
             m=re.match(r">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=([0-9.]*); Pages=(\d*);", line)
             if m is not None:
-                action.Name=m.groups()[0]
+                action.Name=FinalizeName(m.groups()[0], note)
                 action.Pages=int(m.groups()[2])
                 action.Bytes=InterpretSize(m.groups()[1], action.Pages)
                 actions.append(action)
                 continue
             m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); URL=.+?; Size=([0-9.]);", line)
             if m is not None:
-                action.Name=m.groups()[0]
+                action.Name=FinalizeName(m.groups()[0], note)
                 action.Bytes=InterpretSize(m.groups()[1])
                 actions.append(action)
                 continue
             m=re.match(">>add: Source=.+?; Sitename=.+?; Display=(.+?); Size=([0-9.]*);", line)
             if m is not None:
-                action.Name=m.groups()[0]
+                action.Name=FinalizeName(m.groups()[0], note)
                 action.Bytes=InterpretSize(m.groups()[1])
                 actions.append(action)
                 continue
             m=re.match(r">>add: Source=.+?; Sitename=.+?; Display=(.+?); Pages=(\d*);", line)
             if m is not None:
-                action.Name=m.groups()[0]
+                action.Name=FinalizeName(m.groups()[0], note)
                 action.Pages=int(m.groups()[1])
                 actions.append(action)
                 continue
@@ -227,7 +248,7 @@ def main():
                     f.writelines("   "+con+" -- ")
                     separator=""
                     for file in acc.ConList.List[conseries][con]:
-                        f.writelines(separator+os.path.splitext(file)[0])
+                        f.writelines(separator+file)
                         separator=", "
                     f.writelines("\n")
                 f.writelines("\n")
@@ -235,7 +256,7 @@ def main():
 
     with open("Con detail report for Edie.txt", "w+", encoding="utf-8") as f:
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
-        f.writelines("Conpubs: Unless otherwise noted, all scans are by Mark Olson.<br>\n")
+        f.writelines("<b>Conpubs:</b> Unless otherwise noted, all scans are by Mark Olson.\n")
 
         lst=list(resultsTotal.ConList.List.keys())
         def WorldconFirst(e) -> bool:
@@ -245,19 +266,30 @@ def main():
         def IsSandbox(con: str) -> bool:
             return con.lower().startswith("xx") or con.lower().startswith("yy") or con.lower().startswith("zz")
 
+        # Emit one "<li>...added item1, item2</li>" for a con.  'added' is the leading text
+        # (a con name for the nested case, or a link for a single-con series).
         def WriteFileList(files, added, f):
-            f.writelines(f"---{added} added ")
+            f.writelines(f"<li>{added} added ")
             separator=""
             for file in files:
-                f.writelines(separator+os.path.splitext(file)[0])
+                f.writelines(separator+file)
                 separator=", "
-            f.writelines("<br>\n")
+            f.writelines("</li>\n")
 
-        # Output structure:
-        #   ---Conseries
-        #       Con 'added' list of items
+        # Output structure (HTML nested list):
+        #   <ul>
+        #     <li><a ...>Con</a> added item, item</li>              <- single-con series (link to the con page)
+        #     <li>
+        #       <a ...>Conseries</a>:                               <- multi-con series (link to the series index)
+        #       <ul>
+        #         <li>Con added item, item</li>
+        #         ...
+        #       </ul>
+        #     </li>
+        #   </ul>
         # There's special code to merge the Conseries to the con when we only added material for a single con in that series
         # When a conseries is present, it is a link to the con series index page.  When it's a single con, there is a link to that con's page
+        f.writelines("<ul>\n")
         for conseries in lst:
             if IsSandbox(conseries):      # Skip since these are the testing sandboxes
                 continue
@@ -271,13 +303,13 @@ def main():
                 WriteFileList(resultsTotal.ConList.List[conseries][con], added, f)
             else:
                 link=FormatLink2(f"fanac.org/conpubs/{conseries}", conseries)
-                f.writelines(f"--{link}:<br>\n")
+                f.writelines(f"<li>\n{link}:\n<ul>\n")
 
                 cons.sort(key=lambda x: ConNameSortKey(x))
                 for con in cons:
                     WriteFileList(resultsTotal.ConList.List[conseries][con], con, f)
-            f.writelines("<br>\n")
-        f.writelines("\n")
+                f.writelines("</ul>\n</li>\n")
+        f.writelines("</ul>\n")
 
     # If the file is writeable, write the timestamp
     # (The file is commonly set to read-only during debugging.)
