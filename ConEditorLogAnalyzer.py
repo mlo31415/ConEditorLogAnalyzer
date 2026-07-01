@@ -167,7 +167,7 @@ def main():
         resultsTotal.ConList.Append(action.ConSeries, action.Convention, action.Name)
 
     # Write reports
-    with open("Con Series report.txt", "w+") as f:
+    with open("Con Series report.txt", "w+", encoding="utf-8") as f:
         for editor, acc in resultsByEditor.items():
             f.writelines(f'{startdatetime.strftime("%B %d, %Y")} -- {datetime.now().strftime("%B %d, %Y")}\n\n')
             f.writelines(f"Editor: {editor}\n")
@@ -182,7 +182,7 @@ def main():
             f.writelines("\n\n")
 
 
-    with open("Con Instance report.txt", "w+") as f:
+    with open("Con Instance report.txt", "w+", encoding="utf-8") as f:
         for editor, acc in resultsByEditor.items():
             f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
             f.writelines("Editor: "+editor+"\n")
@@ -211,7 +211,7 @@ def main():
         return f"{name[0]} {val:2}"
 
 
-    with open("Con detail report.txt", "w+") as f:
+    with open("Con detail report.txt", "w+", encoding="utf-8") as f:
         for editor, acc in resultsByEditor.items():
             f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"\n\n")
             f.writelines("Editor: "+editor+"\n")
@@ -233,7 +233,7 @@ def main():
                 f.writelines("\n")
             f.writelines("\n\n")
 
-    with open("Con detail report for Edie.txt", "w+") as f:
+    with open("Con detail report for Edie.txt", "w+", encoding="utf-8") as f:
         f.writelines(startdatetime.strftime("%B %d, %Y")+" -- "+datetime.now().strftime("%B %d, %Y")+"<p><p>\n\n")
         f.writelines("Conpubs: Unless otherwise noted, all scans are by Mark Olson.<br>\n")
 
